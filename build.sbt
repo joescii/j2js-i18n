@@ -66,4 +66,22 @@ pomExtra := (
          </developers>
  )
 
- 
+// Jasmine stuff
+seq(jasmineSettings : _*)
+
+// This is where our test stuff drops off the generated javascript files
+appJsDir <+= (resourceManaged in Test) { _ / "js" }
+
+// Don't really use this, but without it the plugin doesn't run.
+appJsLibDir <+= (resourceManaged in Test) { _ / "js" }
+
+// Our specs files live here.
+jasmineTestDir <+= sourceDirectory { src => src / "test" / "js" }
+
+jasmineConfFile <+= sourceDirectory { src => src / "test" / "js" / "test.dependencies.js" }
+
+jasmineRequireJsFile <+= sourceDirectory { src => src / "test" / "js" / "3rdlib" / "require" / "require-2.0.6.js" }
+
+jasmineRequireConfFile <+= sourceDirectory { src => src / "test" / "js" / "3rdlib" / "require.conf.js" }
+
+(jasmine) <<= (jasmine) dependsOn (test in Test)
