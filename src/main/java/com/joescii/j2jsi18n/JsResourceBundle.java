@@ -1,7 +1,15 @@
 package com.joescii.j2jsi18n;
 
+import java.util.ResourceBundle;
+
 /**
- * Created by jbarnes on 2/10/14.
+ * JavaScript ResourceBundle
  */
 public class JsResourceBundle {
+    private final ResourceBundle bundle;
+
+    public JsResourceBundle(ResourceBundle bundle) {
+        this.bundle = bundle;
+    }
+
 }
