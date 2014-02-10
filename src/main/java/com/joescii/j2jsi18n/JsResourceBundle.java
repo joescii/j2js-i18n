@@ -12,4 +12,7 @@ public class JsResourceBundle {
         this.bundle = bundle;
     }
 
+    public String toJs() {
+        return "{}";
+    }
 }

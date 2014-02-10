@@ -85,3 +85,12 @@ jasmineRequireJsFile <+= sourceDirectory { src => src / "test" / "js" / "3rdlib"
 jasmineRequireConfFile <+= sourceDirectory { src => src / "test" / "js" / "3rdlib" / "require.conf.js" }
 
 (jasmine) <<= (jasmine) dependsOn (test in Test)
+
+// Create a target directory and set a system property so our JS-generating tests know where to put their files
+resourceGenerators in Test <+= (resourceManaged in Test) map { rsrc =>
+   val dir = rsrc / "js" 
+   IO.createDirectory(dir)
+   System.setProperty("com.joescii.test.js", dir.toString)
+   Seq(dir)
+}
+  

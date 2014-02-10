@@ -5,6 +5,7 @@ import matchers.ShouldMatchers
 
 import java.util.ResourceBundle
 import java.util
+import java.io._
 
 import scala.collection.JavaConverters._
 
@@ -32,10 +33,20 @@ class TestBundleSpecs extends WordSpec with ShouldMatchers {
 }
 
 class JsResourceBundleSpecs extends WordSpec with ShouldMatchers {
+  lazy val dir = new File(System.getProperty("com.joescii.test.js"))
+
+  def write(name:String, contents:String) = {
+    val file = new File(dir, name)
+    val writer = new PrintStream(new FileOutputStream(file))
+    writer.println(contents)
+    writer.close()
+  }
+
   "JsResourceBundle" should {
-    "instantiate" in {
+    "generate test0.js" in {
       val jbundle = TestBundle("ok" -> "OK", "cancel" -> "Cancel")
       val jsbundle = new JsResourceBundle(jbundle)
+      write("test0.js", "var test0 = "+jsbundle.toJs+";")
     }
   }
 }
