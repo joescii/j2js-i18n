@@ -4,9 +4,11 @@ organization := "com.joescii"
 
 version := "0.0.1-SNAPSHOT"
 
-scalaVersion := "2.9.1"
+scalaVersion := "2.10.3"
 
-crossScalaVersions := Seq("2.9.1", "2.9.1-1", "2.9.2", "2.9.3", "2.10.3")
+autoScalaLibrary := false
+
+crossPaths := false
 
 resolvers ++= Seq(
   "sonatype-snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
@@ -15,10 +17,12 @@ resolvers ++= Seq(
 
 libraryDependencies ++= {
   Seq(
-//    "org.scalatest"  %% "scalatest"   % "1.9.1"  % "test",
-//    "org.scalacheck" %% "scalacheck"  % "1.10.1" % "test"
+    "org.scalatest"  %% "scalatest"   % "1.9.1"  % "test",
+    "org.scalacheck" %% "scalacheck"  % "1.10.1" % "test"
   )
 }
+
+javacOptions in (Compile,compile) ++= Seq("-source", "1.6", "-target", "1.6", "-g")
 
 scalacOptions <<= scalaVersion map { v: String =>
   val opts = "-deprecation" :: "-unchecked" :: Nil
