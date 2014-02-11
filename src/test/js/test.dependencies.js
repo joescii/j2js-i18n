@@ -3,4 +3,5 @@
 //EnvJasmine.loadGlobal(EnvJasmine.libDir + "/test/require.conf.js");
 
 EnvJasmine.loadGlobal(EnvJasmine.libDir + "/test0.js");
+EnvJasmine.loadGlobal(EnvJasmine.libDir + "/test1.js");
 

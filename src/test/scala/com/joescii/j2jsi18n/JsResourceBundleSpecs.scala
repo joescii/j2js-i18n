@@ -44,9 +44,15 @@ class JsResourceBundleSpecs extends WordSpec with ShouldMatchers {
 
   "JsResourceBundle" should {
     "generate test0.js" in {
-      val jbundle = TestBundle("ok" -> "OK", "cancel" -> "Cancel")
+      val jbundle = TestBundle()
       val jsbundle = new JsResourceBundle(jbundle)
       write("test0.js", "var test0 = "+jsbundle.toJs+";")
+    }
+
+    "generate test1.js" in {
+      val jbundle = TestBundle("ok" -> "OK", "cancel" -> "Cancel")
+      val jsbundle = new JsResourceBundle(jbundle)
+      write("test1.js", "var test1 = "+jsbundle.toJs+";")
     }
   }
 }
