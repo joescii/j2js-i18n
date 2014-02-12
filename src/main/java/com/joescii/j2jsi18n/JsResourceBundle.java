@@ -8,11 +8,22 @@ import java.util.*;
 public class JsResourceBundle {
     private final ResourceBundle bundle;
 
+    /**
+     * Instantiates a new <code>JsResourceBundle</code> backed by the <code>ResourceBundle</code> given.
+     * @param bundle The <code>ResourceBundle</code> to back this <code>JsResourceBundle</code>.
+     */
     public JsResourceBundle(ResourceBundle bundle) {
         this.bundle = bundle;
     }
 
+    /**
+     * Returns this <code>JsResourceBundle</code> as a JavaScript object
+     * @return
+     */
     public String toJs() {
+        // TODO: Values with argumens
+        // TODO: Keys with .'s and other junk
+        
         final StringBuilder sb = new StringBuilder();
         sb.append('{');
         for(Iterator<String> iter = bundle.keySet().iterator(); iter.hasNext();) {
