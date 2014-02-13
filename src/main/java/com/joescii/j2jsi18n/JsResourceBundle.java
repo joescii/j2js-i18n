@@ -21,15 +21,15 @@ public class JsResourceBundle {
      * @return
      */
     public String toJs() {
-        // TODO: Values with argumens
-        // TODO: Keys with .'s and other junk
-        
+        // TODO: Values with arguments
+
         final StringBuilder sb = new StringBuilder();
         sb.append('{');
         for(Iterator<String> iter = bundle.keySet().iterator(); iter.hasNext();) {
             final String key = iter.next();
             final String val = bundle.getString(key);
-            sb.append(key).append(':').append('"').append(val).append('"');
+            sb.append('"').append(key).append('"')
+                .append(':').append('"').append(val).append('"');
             if(iter.hasNext()) sb.append(',');
         }
         sb.append('}');
