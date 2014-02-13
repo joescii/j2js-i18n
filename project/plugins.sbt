@@ -1,1 +1,1 @@
-addSbtPlugin("com.gu" % "sbt-jasmine-plugin" % "0.8-SNAPSHOT")  // https://github.com/barnesjd/sbt-jasmine-plugin
+addSbtPlugin("com.joescii" % "sbt-jasmine-plugin" % "1.2.0")  // https://github.com/barnesjd/sbt-jasmine-plugin
