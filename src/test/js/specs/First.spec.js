@@ -27,7 +27,9 @@
 
   describe('A JsResourceBundle with a parameterized value of cardinality 1', function() {
     it('should render a function taking one argument', function() {
-      expect(test3.params(5)).toEqual("This has 5 param(s).")
+      expect(test3.params(5)).toEqual("This has 5 param(s).");
+      expect(test3.leading(3)).toEqual("3 param(s) in the lead.");
+      expect(test3.trailing(7)).toEqual("Number of params trailing is 7");
     });
   });
 }).call(this);
