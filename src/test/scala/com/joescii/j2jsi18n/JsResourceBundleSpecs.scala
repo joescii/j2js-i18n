@@ -59,5 +59,9 @@ class JsResourceBundleSpecs extends WordSpec with ShouldMatchers {
     "generate test2.js" in {
       generate(Map("class" -> "Clazz", "com.joescii" -> "Joe Barnes"), 2)
     }
+
+    "generate test3.js" in {
+      generate(Map("params" -> "This has {0} param(s)."), 3)
+    }
   }
 }

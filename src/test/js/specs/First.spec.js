@@ -24,4 +24,10 @@
       expect(test2["com.joescii"]).toEqual("Joe Barnes");
     });
   });
+
+  describe('A JsResourceBundle with a parameterized value of cardinality 1', function() {
+    it('should render a function taking one argument', function() {
+      expect(test3.params(5)).toEqual("This has 5 param(s).")
+    });
+  });
 }).call(this);

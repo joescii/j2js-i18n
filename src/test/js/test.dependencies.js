@@ -5,4 +5,5 @@
 EnvJasmine.loadGlobal(EnvJasmine.libDir + "/test0.js");
 EnvJasmine.loadGlobal(EnvJasmine.libDir + "/test1.js");
 EnvJasmine.loadGlobal(EnvJasmine.libDir + "/test2.js");
+EnvJasmine.loadGlobal(EnvJasmine.libDir + "/test3.js");
 
