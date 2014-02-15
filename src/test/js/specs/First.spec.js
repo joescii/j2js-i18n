@@ -32,4 +32,12 @@
       expect(test3.trailing(7)).toEqual("Number of params trailing is 7");
     });
   });
+
+  describe('A JsResourceBundle with multiple parameter values', function (){
+    // test4
+  });
+
+  describe('A JsResourceBundle with out-of-order and missing parameter values', function () {
+    // test5
+  });
 }).call(this);
