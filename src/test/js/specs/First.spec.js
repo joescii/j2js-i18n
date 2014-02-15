@@ -46,5 +46,9 @@
       expect(test5.order2("arg0", "arg1")).toEqual("Out arg1 of arg0 order");
       expect(test5.order3("arg0", "arg1", "arg2")).toEqual("Out arg1 of arg0 order arg2");
     });
+
+    it('should render a function that handles missing parameters', function() {
+      expect(test5.missing2("arg0", "arg1", "arg2")).toEqual("Missing arg2 one arg0");
+    });
   });
 }).call(this);

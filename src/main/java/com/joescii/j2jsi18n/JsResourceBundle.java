@@ -46,10 +46,11 @@ public class JsResourceBundle {
                 } while (m.find());
 
                 // Build the function declaration
+                int numArgs = Collections.max(args);
                 sb.append("function(");
-                for(int i=0; i<chunks.size()-1; i++) {
+                for(int i=0; i<=numArgs; i++) {
                     sb.append("p").append(i);
-                    if(i < chunks.size()-2) // this is NOT the last one
+                    if(i < numArgs) // this is NOT the last one
                       sb.append(",");
                 }
                 sb.append("){return'");
