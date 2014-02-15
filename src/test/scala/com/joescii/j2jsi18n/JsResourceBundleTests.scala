@@ -85,3 +85,26 @@ class JsResourceBundleSpecs extends WordSpec with ShouldMatchers {
     }
   }
 }
+
+import org.mozilla.javascript._
+import org.scalacheck._
+import Prop._
+import Arbitrary._
+
+object JsResourceBundleChecks extends Properties("JsResourceBundle") {
+  property("toJs(no param values)") = forAll { (k:String, v:String) =>
+    if(k.isEmpty) true
+    else {
+      val i18n = new JsResourceBundle(TestBundle(k -> v)).toJs
+      val cx = Context.enter()
+      try {
+        val scope = cx.initStandardObjects()
+        val res = cx.evaluateString(scope, s"i18n = $i18n; v = i18n['$k'];", "filename", 1, null)
+        val vjs = scope.get("v", scope)
+        Context.toString(vjs) == v
+      } finally {
+        Context.exit()
+      }
+    }
+  }
+}
