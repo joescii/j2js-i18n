@@ -2,7 +2,7 @@ name := "j2js-i18n"
 
 organization := "com.joescii"
 
-version := "0.0.1-SNAPSHOT"
+version := "0.1-SNAPSHOT"
 
 scalaVersion := "2.10.3"
 
