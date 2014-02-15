@@ -34,7 +34,11 @@
   });
 
   describe('A JsResourceBundle with multiple parameter values', function (){
-    // test4
+    it('should render a function taking multiple arguments', function() {
+      expect(test4.params2("one", "two")).toEqual("This one has two two params.");
+      expect(test4.params3("one", "two", "three")).toEqual("This one has two three three params.");
+      expect(test4.params9(1,2,3,4,5,6,7,8,9)).toEqual("Just 1 for 2 really 3 good 4 measure 5 this 6 string 7 has 8 nine! 9");
+    });
   });
 
   describe('A JsResourceBundle with out-of-order and missing parameter values', function () {

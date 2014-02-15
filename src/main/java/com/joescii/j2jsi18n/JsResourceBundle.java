@@ -33,12 +33,34 @@ public class JsResourceBundle {
 
             sb.append('"').append(key).append('"').append(':');
 
-            // TODO: Generalize for arbitrary number of args.
             Matcher m = arg.matcher(val);
-            if(m.find())
-                sb.append("function(p0){return'").append(m.group(1)).append("'+p0+'").append(m.group(3)).append("';}");
-            else
+            if(m.find()) {
+                List<String> l = new LinkedList<String>();
+                l.add(m.group(1));
+
+                // Get all of the chunks of the value
+                do {
+                    l.add(m.group(3));
+                } while (m.find());
+
+                // Build the function declaration
+                sb.append("function(");
+                for(int i=0; i<l.size()-1; i++) {
+                    sb.append("p").append(i);
+                    if(i < l.size()-2) // this is NOT the last one
+                      sb.append(",");
+                }
+                sb.append("){return'");
+
+                // Assemble the string and arguments for the body of the function
+                sb.append(l.get(0)).append("'"); // Add the leading stuff
+                for(int i=1; i<l.size(); i++)
+                    sb.append("+p"+(i-1)+"+'").append(l.get(i)).append("'");
+                sb.append(";}");
+            }
+            else {
                 sb.append('"').append(val).append('"');
+            }
 
             if(iter.hasNext()) sb.append(',');
         }
