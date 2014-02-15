@@ -20,6 +20,11 @@ public class JsResourceBundle {
 
     private static final Pattern arg = Pattern.compile("(.*?)\\{(\\d+)\\}([^\\{]*)");
 
+    private String legalize(String s) {
+        return s.replaceAll("\"", Matcher.quoteReplacement("\\\""))
+                .replaceAll("\\n", "\\\\n");
+    }
+
     /**
      * Returns this <code>JsResourceBundle</code> as a JavaScript object
      * @return
@@ -31,7 +36,7 @@ public class JsResourceBundle {
             final String key = iter.next();
             final String val = bundle.getString(key);
 
-            sb.append('"').append(key).append('"').append(':');
+            sb.append('"').append(legalize(key)).append('"').append(':');
 
             Matcher m = arg.matcher(val);
             if(m.find()) {
@@ -56,13 +61,13 @@ public class JsResourceBundle {
                 sb.append("){return'");
 
                 // Assemble the string and arguments for the body of the function
-                sb.append(chunks.get(0)).append("'"); // Add the leading stuff
+                sb.append(legalize(chunks.get(0))).append("'"); // Add the leading stuff
                 for(int i=1; i<chunks.size(); i++)
-                    sb.append("+p"+args.get(i-1)+"+'").append(chunks.get(i)).append("'");
+                    sb.append("+p"+args.get(i-1)+"+'").append(legalize(chunks.get(i))).append("'");
                 sb.append(";}");
             }
             else {
-                sb.append('"').append(val).append('"');
+                sb.append('"').append(legalize(val)).append('"');
             }
 
             if(iter.hasNext()) sb.append(',');

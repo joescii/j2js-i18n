@@ -22,6 +22,9 @@
     it('should render an object nonetheless', function() {
       expect(test2["class"]).toEqual("Clazz");
       expect(test2["com.joescii"]).toEqual("Joe Barnes");
+      expect(test2["a 'key'"]).toEqual("a 'value'");
+      expect(test2["with.newline"]).toEqual("another \n newline");
+      expect(test2['dbl"quote']).toEqual("ridiculous, but should work");
     });
   });
 

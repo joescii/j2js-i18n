@@ -95,3 +95,4 @@ resourceGenerators in Test <+= (resourceManaged in Test) map { rsrc =>
    Seq(dir)
 }
   
+testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck, "-s", "1000")

@@ -57,7 +57,13 @@ class JsResourceBundleSpecs extends WordSpec with ShouldMatchers {
     }
 
     "generate test2.js" in {
-      generate(Map("class" -> "Clazz", "com.joescii" -> "Joe Barnes"), 2)
+      generate(Map(
+        "class" -> "Clazz",
+        "com.joescii" -> "Joe Barnes",
+        "a 'key'" -> "a 'value'",
+        "with.newline" -> "another \n newline",
+        "dbl\"quote" -> "ridiculous, but should work"
+      ), 2)
     }
 
     "generate test3.js" in {
@@ -86,25 +92,58 @@ class JsResourceBundleSpecs extends WordSpec with ShouldMatchers {
   }
 }
 
+import java.text.MessageFormat
 import org.mozilla.javascript._
 import org.scalacheck._
-import Prop._
-import Arbitrary._
 
 object JsResourceBundleChecks extends Properties("JsResourceBundle") {
-  property("toJs(no param values)") = forAll { (k:String, v:String) =>
-    if(k.isEmpty) true
-    else {
-      val i18n = new JsResourceBundle(TestBundle(k -> v)).toJs
-      val cx = Context.enter()
-      try {
-        val scope = cx.initStandardObjects()
-        val res = cx.evaluateString(scope, s"i18n = $i18n; v = i18n['$k'];", "filename", 1, null)
-        val vjs = scope.get("v", scope)
-        Context.toString(vjs) == v
-      } finally {
-        Context.exit()
+  def jsCheck(js:String, expected:String):Boolean = {
+    val cx = Context.enter()
+    try {
+      val scope = cx.initStandardObjects()
+      val res = cx.evaluateString(scope, js, "line", 1, null)
+      val vjs = scope.get("v", scope)
+      Context.toString(vjs) == expected
+    } catch {
+      case e:Exception => {
+        println(e.toString+": "+js)
+        false
       }
+    } finally {
+      Context.exit()
+    }
+  }
+
+  def isLegalJsString(s:String):Boolean = {
+    val cx = Context.enter()
+    try {
+      val scope = cx.initStandardObjects()
+      val res = cx.evaluateString(scope, s"v = '$s'", "line", 1, null)
+      val vjs = scope.get("v", scope)
+      Context.toString(vjs) == s
+    } catch {
+      case e:Exception => false
+    } finally {
+      Context.exit()
+    }
+  }
+
+  import Prop._
+
+  property("toJs(no param values)") = forAll { (k:String, v:String) =>
+    (!k.isEmpty && isLegalJsString(k) && isLegalJsString(v)) ==> {
+      val i18n = new JsResourceBundle(TestBundle(k -> v)).toJs
+      jsCheck(s"i18n = $i18n; v = i18n['$k'];", v)
+    }
+  }
+
+  property("toJs(1 param)") = forAll { (k:String, v:String, pos:Int, p0:String) =>
+    (!k.isEmpty && isLegalJsString(k) && isLegalJsString(v) && isLegalJsString(p0)) ==> {
+      val vSplit = v.splitAt(if(v.length > 0) pos % v.length else 0)
+      val vWithParam = vSplit._1 + "{0}" + vSplit._2
+      val i18n = new JsResourceBundle(TestBundle(k -> vWithParam)).toJs
+      val formatted = MessageFormat.format(vWithParam, p0)
+      jsCheck(s"i18n = $i18n; v = i18n['$k']('$p0');", formatted)
     }
   }
 }
