@@ -42,6 +42,9 @@
   });
 
   describe('A JsResourceBundle with out-of-order and missing parameter values', function () {
-    // test5
+    it('should render a function that correctly handles the order of arguments', function() {
+      expect(test5.order2("arg0", "arg1")).toEqual("Out arg1 of arg0 order");
+      expect(test5.order3("arg0", "arg1", "arg2")).toEqual("Out arg1 of arg0 order arg2");
+    });
   });
 }).call(this);

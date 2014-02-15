@@ -35,27 +35,29 @@ public class JsResourceBundle {
 
             Matcher m = arg.matcher(val);
             if(m.find()) {
-                List<String> l = new LinkedList<String>();
-                l.add(m.group(1));
+                List<String> chunks = new LinkedList<String>();
+                List<Integer> args = new ArrayList<Integer>();
+                chunks.add(m.group(1));
 
                 // Get all of the chunks of the value
                 do {
-                    l.add(m.group(3));
+                    args.add(Integer.parseInt(m.group(2)));
+                    chunks.add(m.group(3));
                 } while (m.find());
 
                 // Build the function declaration
                 sb.append("function(");
-                for(int i=0; i<l.size()-1; i++) {
+                for(int i=0; i<chunks.size()-1; i++) {
                     sb.append("p").append(i);
-                    if(i < l.size()-2) // this is NOT the last one
+                    if(i < chunks.size()-2) // this is NOT the last one
                       sb.append(",");
                 }
                 sb.append("){return'");
 
                 // Assemble the string and arguments for the body of the function
-                sb.append(l.get(0)).append("'"); // Add the leading stuff
-                for(int i=1; i<l.size(); i++)
-                    sb.append("+p"+(i-1)+"+'").append(l.get(i)).append("'");
+                sb.append(chunks.get(0)).append("'"); // Add the leading stuff
+                for(int i=1; i<chunks.size(); i++)
+                    sb.append("+p"+args.get(i-1)+"+'").append(chunks.get(i)).append("'");
                 sb.append(";}");
             }
             else {
