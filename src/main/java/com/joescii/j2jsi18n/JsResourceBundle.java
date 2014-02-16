@@ -21,8 +21,10 @@ public class JsResourceBundle {
     private static final Pattern arg = Pattern.compile("(.*?)\\{(\\d+)\\}([^\\{]*)");
 
     private String legalize(String s) {
-        return s.replaceAll("\"", Matcher.quoteReplacement("\\\""))
-                .replaceAll("\\n", "\\\\n");
+        return s.replaceAll("\\\\", Matcher.quoteReplacement("\\\\"))
+                .replaceAll("\"", Matcher.quoteReplacement("\\\""))
+                .replaceAll("\\n", "\\\\n")
+                ;
     }
 
     /**

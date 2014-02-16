@@ -62,7 +62,8 @@ class JsResourceBundleSpecs extends WordSpec with ShouldMatchers {
         "com.joescii" -> "Joe Barnes",
         "a 'key'" -> "a 'value'",
         "with.newline" -> "another \n newline",
-        "dbl\"quote" -> "ridiculous, but should work"
+        "dbl\"quote" -> "ridiculous, but should work",
+        "back\\slash" -> "Back\\slash"
       ), 2)
     }
 
@@ -106,7 +107,7 @@ object JsResourceBundleChecks extends Properties("JsResourceBundle") {
       Context.toString(vjs) == expected
     } catch {
       case e:Exception => {
-        println(e.toString+": "+js)
+//        println(e.toString+": "+js)
         false
       }
     } finally {
@@ -114,36 +115,29 @@ object JsResourceBundleChecks extends Properties("JsResourceBundle") {
     }
   }
 
-  def isLegalJsString(s:String):Boolean = {
-    val cx = Context.enter()
-    try {
-      val scope = cx.initStandardObjects()
-      val res = cx.evaluateString(scope, s"v = '$s'", "line", 1, null)
-      val vjs = scope.get("v", scope)
-      Context.toString(vjs) == s
-    } catch {
-      case e:Exception => false
-    } finally {
-      Context.exit()
-    }
-  }
-
   import Prop._
 
-  property("toJs(no param values)") = forAll { (k:String, v:String) =>
-    (!k.isEmpty && isLegalJsString(k) && isLegalJsString(v)) ==> {
+  property("toJs(no param values)") = forAll(Gen.identifier, Gen.identifier) { (k:String, v:String) =>
+    (!k.isEmpty) ==> {
       val i18n = new JsResourceBundle(TestBundle(k -> v)).toJs
       jsCheck(s"i18n = $i18n; v = i18n['$k'];", v)
     }
   }
 
-  property("toJs(1 param)") = forAll { (k:String, v:String, pos:Int, p0:String) =>
-    (!k.isEmpty && isLegalJsString(k) && isLegalJsString(v) && isLegalJsString(p0)) ==> {
+  property("toJs(1 param)") = forAll(Gen.identifier, Gen.identifier, Gen.choose(1, 1000), Gen.identifier) { (k:String, v:String, pos:Int, p0:String) =>
+    (!k.isEmpty) ==> {
       val vSplit = v.splitAt(if(v.length > 0) pos % v.length else 0)
       val vWithParam = vSplit._1 + "{0}" + vSplit._2
       val i18n = new JsResourceBundle(TestBundle(k -> vWithParam)).toJs
       val formatted = MessageFormat.format(vWithParam, p0)
-      jsCheck(s"i18n = $i18n; v = i18n['$k']('$p0');", formatted)
+      if(jsCheck(s"i18n = $i18n; v = i18n['$k']('$p0');", formatted))
+        true
+      else {
+        println("k:  "+k.getBytes.mkString(","))
+        println("v:  "+v.getBytes.mkString(","))
+        println("p0: "+p0.getBytes.mkString(","))
+        false
+      }
     }
   }
 }

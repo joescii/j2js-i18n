@@ -25,6 +25,7 @@
       expect(test2["a 'key'"]).toEqual("a 'value'");
       expect(test2["with.newline"]).toEqual("another \n newline");
       expect(test2['dbl"quote']).toEqual("ridiculous, but should work");
+      expect(test2['back\\slash']).toEqual("Back\\slash");
     });
   });
 
