@@ -31,6 +31,7 @@ scalacOptions <<= scalaVersion map { v: String =>
   else opts ++ ("-feature" :: "-language:postfixOps" :: "-language:implicitConversions" :: Nil)
 }
 
+// Publishing stuff for sonatype
 publishTo <<= version { _.endsWith("SNAPSHOT") match {
     case true  => Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots")
     case false => Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
@@ -97,6 +98,16 @@ resourceGenerators in Test <+= (resourceManaged in Test) map { rsrc =>
   
 testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck, "-s", "1000")
 
+// OSGi stuff
 osgiSettings
 
+OsgiKeys.bundleSymbolicName := "com.joescii.j2jsi18n"
+
 OsgiKeys.exportPackage := Seq("com.joescii.j2jsi18n")
+
+OsgiKeys.importPackage := Seq()
+
+OsgiKeys.privatePackage := Seq()
+
+OsgiKeys.bundleActivator := None
+
