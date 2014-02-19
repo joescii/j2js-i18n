@@ -96,3 +96,7 @@ resourceGenerators in Test <+= (resourceManaged in Test) map { rsrc =>
 }
   
 testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck, "-s", "1000")
+
+osgiSettings
+
+OsgiKeys.exportPackage := Seq("com.joescii.j2jsi18n")
