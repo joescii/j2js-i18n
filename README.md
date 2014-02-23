@@ -54,7 +54,7 @@ To use **j2js-i18n**, you instantiate a `com.joescii.j2jsi18n.JsResourceBundle` 
 
 ## Examples
 
-Below are some examples of utilizing j2js-i18n in different languages and frameworks.
+Below are some examples of utilizing **j2js-i18n** in different languages and frameworks.
 
 ### Java
 
