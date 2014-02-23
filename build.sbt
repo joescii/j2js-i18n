@@ -2,7 +2,7 @@ name := "j2js-i18n"
 
 organization := "com.joescii"
 
-version := "0.1-SNAPSHOT"
+version := "0.1"
 
 scalaVersion := "2.10.3"
 
@@ -110,4 +110,3 @@ OsgiKeys.importPackage := Seq()
 OsgiKeys.privatePackage := Seq()
 
 OsgiKeys.bundleActivator := None
-
