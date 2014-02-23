@@ -52,6 +52,10 @@ libraryDependencies ++= Seq(
 
 To use **j2js-i18n**, you instantiate a `com.joescii.j2jsi18n.JsResourceBundle` passing it the `java.util.ResourceBundle` that is appropriate for the request's locale (here we assume your web application framework is already doing a great job of choosing the appropriate bundles).  Call the `toJs()` method to access the JavaScript object.
 
+## Javadocs
+
+The latest javadocs can be found [here](http://barnesjd.github.io/j2js-i18n/api/), although there is very little to see.
+
 ## Examples
 
 Below are some examples of utilizing **j2js-i18n** in different languages and frameworks.
