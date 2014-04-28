@@ -44,7 +44,7 @@ Add **j2js-i18n** as a dependency in your `build.sbt` or `Build.scala` as approp
 ```scala
 libraryDependencies ++= Seq(
   // Other dependencies ...
-  "com.joescii" %% "j2js-i18n" % "0.1" % "compile"
+  "com.joescii" % "j2js-i18n" % "0.1" % "compile"
 )
 ```
 
