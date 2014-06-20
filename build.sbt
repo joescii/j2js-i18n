@@ -47,7 +47,7 @@ publishArtifact in Test := false
 pomIncludeRepository := { _ => false }
 
 pomExtra := (
-        <url>https://github.com/barnesjd/j2js-i18n</url>
+        <url>https://github.com/joescii/j2js-i18n</url>
         <licenses>
             <license>
               <name>Apache 2.0 License</name>
@@ -56,14 +56,14 @@ pomExtra := (
             </license>
          </licenses>
          <scm>
-            <url>git@github.com:barnesjd/j2js-i18n.git</url>
-            <connection>scm:git:git@github.com:barnesjd/j2js-i18n.git</connection>
+            <url>git@github.com:joescii/j2js-i18n.git</url>
+            <connection>scm:git:git@github.com:joescii/j2js-i18n.git</connection>
          </scm>
          <developers>
             <developer>
-              <id>barnesjd</id>
+              <id>joescii</id>
               <name>Joe Barnes</name>
-              <url>https://github.com/barnesjd</url>
+              <url>https://github.com/joescii</url>
             </developer>
          </developers>
  )

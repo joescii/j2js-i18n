@@ -54,7 +54,7 @@ To use **j2js-i18n**, you instantiate a `com.joescii.j2jsi18n.JsResourceBundle` 
 
 ## Javadocs
 
-The latest javadocs can be found [here](http://barnesjd.github.io/j2js-i18n/api/), although there is very little to see.
+The latest javadocs can be found [here](http://joescii.github.io/j2js-i18n/api/), although there is very little to see.
 
 ## Examples
 
