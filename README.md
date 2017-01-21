@@ -44,13 +44,14 @@ Add **j2js-i18n** as a dependency in your `build.sbt` or `Build.scala` as approp
 ```scala
 libraryDependencies ++= Seq(
   // Other dependencies ...
-  "com.joescii" % "j2js-i18n" % "0.1.1" % "compile"
+  "com.joescii" % "j2js-i18n" % "0.2.0" % "compile"
 )
 ```
 
 ## Usage
 
-To use **j2js-i18n**, you instantiate a `com.joescii.j2jsi18n.JsResourceBundle` passing it the `java.util.ResourceBundle` that is appropriate for the request's locale (here we assume your web application framework is already doing a great job of choosing the appropriate bundles).  Call the `toJs()` method to access the JavaScript object.
+To use **j2js-i18n**, you instantiate a `com.joescii.j2jsi18n.JsResourceBundle` passing it the `java.util.ResourceBundle` that is appropriate for the request's locale (here we assume your web application framework is already doing a great job of choosing the appropriate bundles).  
+Call the `toJs()` method to access the JavaScript object.
 
 ## Javadocs
 
@@ -84,6 +85,8 @@ case object MySnip {
 
 ## Change log
 
+* *0.2.0*: **BREAKING CHANGE:** All entries are now functions, i.e. strings with no parameters are a function expecting zero arguments.
+Added `localize(id, default, arg...)` to allow safe access to values with a default when an `id` is not defined.
 * *0.1.1*: Bug fix to correctly escape quotes in parameterized strings
 * *0.1*: Initial release
 
