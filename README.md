@@ -44,7 +44,7 @@ Add **j2js-i18n** as a dependency in your `build.sbt` or `Build.scala` as approp
 ```scala
 libraryDependencies ++= Seq(
   // Other dependencies ...
-  "com.joescii" % "j2js-i18n" % "0.1" % "compile"
+  "com.joescii" % "j2js-i18n" % "0.1.1" % "compile"
 )
 ```
 
@@ -81,4 +81,9 @@ case object MySnip {
   }
 }
 ```
+
+## Change log
+
+* *0.1.1*: Bug fix to correctly escape quotes in parameterized strings
+* *0.1*: Initial release
 
