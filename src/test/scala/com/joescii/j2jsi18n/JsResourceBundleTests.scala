@@ -129,6 +129,15 @@ class JsResourceBundleSpecs extends WordSpec with Matchers {
         "missing2" -> ("Missing {2} one {0}", "'arg0','arg1','arg2'", "Missing arg2 one arg0")
       ), 5)
     }
+
+    "generate test6.js" in {
+      runChecksParams(Map(
+        "contains.quotes" -> ("This \" has a {0} quote", "'arg0'", "This \" has a arg0 quote"),
+        "arg.contains.quote" -> ("This has {0} no quotes", "'ar\"g'", "This has ar\"g no quotes"),
+        "both.contain.quotes" -> ("These \" both have a {0} quote", "'ar\"g'", "These \" both have a ar\"g quote"),
+        "single.quote" -> ("a ' {0} single", "'arg0'", "a ' arg0 single")
+      ), 6)
+    }
   }
 }
 

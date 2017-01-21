@@ -60,12 +60,12 @@ public class JsResourceBundle {
                     if(i < numArgs) // this is NOT the last one
                       sb.append(",");
                 }
-                sb.append("){return'");
+                sb.append("){return\"");
 
                 // Assemble the string and arguments for the body of the function
-                sb.append(legalize(chunks.get(0))).append("'"); // Add the leading stuff
+                sb.append(legalize(chunks.get(0))).append('"'); // Add the leading stuff
                 for(int i=1; i<chunks.size(); i++)
-                    sb.append("+p"+args.get(i-1)+"+'").append(legalize(chunks.get(i))).append("'");
+                    sb.append("+p"+args.get(i-1)+"+\"").append(legalize(chunks.get(i))).append('"');
                 sb.append(";}");
             }
             else {
