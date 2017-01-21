@@ -68,7 +68,7 @@ class JsResourceBundleSpecs extends WordSpec with Matchers {
     val js = new JsResourceBundle(TestBundle(m)).toJs
     write(s"test$i.js", s"var test$i = $js;")
     m.foreach { case (k, v) =>
-      val result = JsEngine.jsCheck(s"""i18n = $js; v = i18n["$k"];""")
+      val result = JsEngine.jsCheck(s"""i18n = $js; v = i18n["$k"]();""")
       result.isDefined shouldEqual true
       result.map(_ shouldEqual v)
     }
@@ -152,7 +152,7 @@ object JsResourceBundleChecks extends Properties("JsResourceBundle") {
   property("toJs(no param values)") = forAll(Gen.identifier, Gen.identifier) { (k:String, v:String) =>
     (!k.isEmpty) ==> {
       val i18n = new JsResourceBundle(TestBundle(k -> v)).toJs
-      jsCheckBoolean(s"i18n = $i18n; v = i18n['$k'];", v)
+      jsCheckBoolean(s"i18n = $i18n; v = i18n['$k']();", v)
     }
   }
 

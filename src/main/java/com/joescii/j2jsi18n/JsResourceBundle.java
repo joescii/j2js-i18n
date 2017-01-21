@@ -69,7 +69,9 @@ public class JsResourceBundle {
                 sb.append(";}");
             }
             else {
+                sb.append("function(){return");
                 sb.append('"').append(legalize(val)).append('"');
+                sb.append(";}");
             }
 
             if(iter.hasNext()) sb.append(',');
