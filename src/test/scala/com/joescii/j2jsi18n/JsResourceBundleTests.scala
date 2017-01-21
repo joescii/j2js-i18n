@@ -1,10 +1,11 @@
 package com.joescii.j2jsi18n
 
 import org.scalatest._
-
 import java.util.ResourceBundle
 import java.util
 import java.io._
+
+import org.mozilla.javascript.Context
 
 import scala.collection.JavaConverters._
 
@@ -31,6 +32,28 @@ class TestBundleSpecs extends WordSpec with Matchers {
   }
 }
 
+object JsEngine {
+  def jsCheck(js:String): Option[String] = {
+    val cx = Context.enter()
+    try {
+      val scope = cx.initStandardObjects()
+      val res = cx.evaluateString(scope, js, "line", 1, null)
+      val vjs = scope.get("v", scope)
+      Some(Context.toString(vjs))
+    } catch {
+      case e:Exception => {
+        println(e.toString+": "+js)
+        None
+      }
+    } finally {
+      Context.exit()
+    }
+  }
+
+  def jsCheckBoolean(js: String, expected: String): Boolean =
+    jsCheck(js).map(expected == _ ).getOrElse(false)
+}
+
 class JsResourceBundleSpecs extends WordSpec with Matchers {
   lazy val dir = new File(System.getProperty("com.joescii.test.js"))
 
@@ -41,52 +64,69 @@ class JsResourceBundleSpecs extends WordSpec with Matchers {
     writer.close()
   }
 
-  def generate(m:Map[String, String], i:Int) = {
+  def runChecksNoParams(m:Map[String, String], i:Int): Unit = {
     val js = new JsResourceBundle(TestBundle(m)).toJs
     write(s"test$i.js", s"var test$i = $js;")
+    m.foreach { case (k, v) =>
+      val result = JsEngine.jsCheck(s"""i18n = $js; v = i18n["$k"];""")
+      result.isDefined shouldEqual true
+      result.map(_ shouldEqual v)
+    }
+  }
+
+  def runChecksParams(m:Map[String, (String, String, String)], i:Int): Unit = {
+    val input = m.mapValues(_._1)
+    val js = new JsResourceBundle(TestBundle(input)).toJs
+    write(s"test$i.js", s"var test$i = $js;")
+    m.foreach { case (k, (_, args, expected)) =>
+      val result = JsEngine.jsCheck(s"""i18n = $js; v = i18n["$k"]($args);""")
+      result.isDefined shouldEqual true
+      result.map(_ shouldEqual expected)
+    }
   }
 
   "JsResourceBundle" should {
     "generate test0.js" in {
-      generate(Map(), 0)
+      runChecksNoParams(Map(), 0)
     }
 
     "generate test1.js" in {
-      generate(Map("ok" -> "OK", "cancel" -> "Cancel"), 1)
+      runChecksNoParams(Map("ok" -> "OK", "cancel" -> "Cancel"), 1)
     }
 
     "generate test2.js" in {
-      generate(Map(
+      runChecksNoParams(Map(
         "class" -> "Clazz",
         "com.joescii" -> "Joe Barnes",
         "a 'key'" -> "a 'value'",
         "with.newline" -> "another \n newline",
-        "dbl\"quote" -> "ridiculous, but should work",
-        "back\\slash" -> "Back\\slash"
+        "dblquote" -> "ridiculous, \" but should work",
+        "backslash" -> "Back\\slash"
       ), 2)
     }
 
     "generate test3.js" in {
-      generate(Map(
-        "params" -> "This has {0} param(s).",
-        "leading" -> "{0} param(s) in the lead.",
-        "trailing" -> "Number of params trailing is {0}"
+      runChecksParams(Map(
+        "params" -> ("This has {0} param(s).", "'arg0'", "This has arg0 param(s)."),
+        "leading" -> ("{0} param(s) in the lead.", "'arg0'", "arg0 param(s) in the lead."),
+        "trailing" -> ("Number of params trailing is {0}", "'arg0'", "Number of params trailing is arg0")
       ), 3)
     }
 
     "generate test4.js" in {
-      generate(Map(
-        "params2" -> "This {0} has {1} two params.",
-        "params3" -> "This {0} has {1} three {2} params.",
-        "params9" -> "Just {0} for {1} really {2} good {3} measure {4} this {5} string {6} has {7} nine! {8}"
+      runChecksParams(Map(
+        "params2" -> ("This {0} has {1} two params.", "'arg0','arg1'", "This arg0 has arg1 two params."),
+        "params3" -> ("This {0} has {1} three {2} params.", "'arg0','arg1','arg2'", "This arg0 has arg1 three arg2 params."),
+        "params9" -> ("Just {0} for {1} really {2} good {3} measure {4} this {5} string {6} has {7} nine! {8}", "'a0','a1','a2','a3','a4','a5','a6','a7','a8'",
+          "Just a0 for a1 really a2 good a3 measure a4 this a5 string a6 has a7 nine! a8")
       ), 4)
     }
 
     "generate test5.js" in {
-      generate(Map(
-        "order2" -> "Out {1} of {0} order",
-        "order3" -> "Out {1} of {0} order {2}",
-        "missing2" -> "Missing {2} one {0}"
+      runChecksParams(Map(
+        "order2" -> ("Out {1} of {0} order", "'arg0','arg1'", "Out arg1 of arg0 order"),
+        "order3" -> ("Out {1} of {0} order {2}", "'arg0','arg1','arg2'", "Out arg1 of arg0 order arg2"),
+        "missing2" -> ("Missing {2} one {0}", "'arg0','arg1','arg2'", "Missing arg2 one arg0")
       ), 5)
     }
   }
@@ -97,29 +137,13 @@ import org.mozilla.javascript._
 import org.scalacheck._
 
 object JsResourceBundleChecks extends Properties("JsResourceBundle") {
-  def jsCheck(js:String, expected:String):Boolean = {
-    val cx = Context.enter()
-    try {
-      val scope = cx.initStandardObjects()
-      val res = cx.evaluateString(scope, js, "line", 1, null)
-      val vjs = scope.get("v", scope)
-      Context.toString(vjs) == expected
-    } catch {
-      case e:Exception => {
-//        println(e.toString+": "+js)
-        false
-      }
-    } finally {
-      Context.exit()
-    }
-  }
-
   import Prop._
+  import JsEngine.jsCheckBoolean
 
   property("toJs(no param values)") = forAll(Gen.identifier, Gen.identifier) { (k:String, v:String) =>
     (!k.isEmpty) ==> {
       val i18n = new JsResourceBundle(TestBundle(k -> v)).toJs
-      jsCheck(s"i18n = $i18n; v = i18n['$k'];", v)
+      jsCheckBoolean(s"i18n = $i18n; v = i18n['$k'];", v)
     }
   }
 
@@ -129,7 +153,7 @@ object JsResourceBundleChecks extends Properties("JsResourceBundle") {
       val vWithParam = vSplit._1 + "{0}" + vSplit._2
       val i18n = new JsResourceBundle(TestBundle(k -> vWithParam)).toJs
       val formatted = MessageFormat.format(vWithParam, p0)
-      if(jsCheck(s"i18n = $i18n; v = i18n['$k']('$p0');", formatted))
+      if(jsCheckBoolean(s"i18n = $i18n; v = i18n['$k']('$p0');", formatted))
         true
       else {
         println("k:  "+k.getBytes.mkString(","))
