@@ -27,6 +27,15 @@ public class JsResourceBundle {
                 ;
     }
 
+    private String localizeJsFn =
+            "localize:function(i,d){" +
+                "var f=this[i];"+
+                "var as=3<=arguments.length?[].slice.call(arguments,2):[];"+
+                "if(typeof f==='function')" +
+                    "return f.apply(this,as);" +
+                "else return d;"+
+            "},";
+
     /**
      * Returns this <code>JsResourceBundle</code> as a JavaScript object
      * @return
@@ -34,6 +43,7 @@ public class JsResourceBundle {
     public String toJs() {
         final StringBuilder sb = new StringBuilder();
         sb.append('{');
+        sb.append(localizeJsFn);
         for(Iterator<String> iter = bundle.keySet().iterator(); iter.hasNext();) {
             final String key = iter.next();
             final String val = bundle.getString(key);
@@ -74,7 +84,7 @@ public class JsResourceBundle {
                 sb.append(";}");
             }
 
-            if(iter.hasNext()) sb.append(',');
+            sb.append(',');
         }
         sb.append('}');
         return sb.toString();

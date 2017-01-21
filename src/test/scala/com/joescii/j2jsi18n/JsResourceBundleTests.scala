@@ -33,7 +33,7 @@ class TestBundleSpecs extends WordSpec with Matchers {
 }
 
 object JsEngine {
-  def jsCheck(js:String): Option[String] = {
+  def returnv(js:String): Option[String] = {
     val cx = Context.enter()
     try {
       val scope = cx.initStandardObjects()
@@ -49,9 +49,6 @@ object JsEngine {
       Context.exit()
     }
   }
-
-  def jsCheckBoolean(js: String, expected: String): Boolean =
-    jsCheck(js).map(expected == _ ).getOrElse(false)
 }
 
 class JsResourceBundleSpecs extends WordSpec with Matchers {
@@ -68,33 +65,44 @@ class JsResourceBundleSpecs extends WordSpec with Matchers {
     val js = new JsResourceBundle(TestBundle(m)).toJs
     write(s"test$i.js", s"var test$i = $js;")
     m.foreach { case (k, v) =>
-      val result = JsEngine.jsCheck(s"""i18n = $js; v = i18n["$k"]();""")
+      val result = JsEngine.returnv(s"""i18n = $js; v = i18n["$k"]();""")
       result.isDefined shouldEqual true
       result.map(_ shouldEqual v)
     }
   }
 
-  def runChecksParams(m:Map[String, (String, String, String)], i:Int): Unit = {
+  def runChecksParams(m: Map[String, (String, String, String)], i: Int): Unit = {
     val input = m.mapValues(_._1)
     val js = new JsResourceBundle(TestBundle(input)).toJs
     write(s"test$i.js", s"var test$i = $js;")
     m.foreach { case (k, (_, args, expected)) =>
-      val result = JsEngine.jsCheck(s"""i18n = $js; v = i18n["$k"]($args);""")
+      val result = JsEngine.returnv(s"""i18n = $js; v = i18n["$k"]($args);""")
+      result.isDefined shouldEqual true
+      result.map(_ shouldEqual expected)
+    }
+  }
+
+  def runCheckV(m: Map[String, (String, String, String)], i: Int): Unit = {
+    val input = m.mapValues(_._1)
+    val js = new JsResourceBundle(TestBundle(input)).toJs
+    write(s"test$i.js", s"var test$i = $js;")
+    m.foreach { case (k, (_, v, expected)) =>
+      val result = JsEngine.returnv(s"""i18n = $js; v = $v;""")
       result.isDefined shouldEqual true
       result.map(_ shouldEqual expected)
     }
   }
 
   "JsResourceBundle" should {
-    "generate test0.js" in {
+    "handle an empty bundle" in {
       runChecksNoParams(Map(), 0)
     }
 
-    "generate test1.js" in {
+    "handle trivial values" in {
       runChecksNoParams(Map("ok" -> "OK", "cancel" -> "Cancel"), 1)
     }
 
-    "generate test2.js" in {
+    "handle values with quotes, etc" in {
       runChecksNoParams(Map(
         "class" -> "Clazz",
         "com.joescii" -> "Joe Barnes",
@@ -105,7 +113,7 @@ class JsResourceBundleSpecs extends WordSpec with Matchers {
       ), 2)
     }
 
-    "generate test3.js" in {
+    "handle single parameters" in {
       runChecksParams(Map(
         "params" -> ("This has {0} param(s).", "'arg0'", "This has arg0 param(s)."),
         "leading" -> ("{0} param(s) in the lead.", "'arg0'", "arg0 param(s) in the lead."),
@@ -113,7 +121,7 @@ class JsResourceBundleSpecs extends WordSpec with Matchers {
       ), 3)
     }
 
-    "generate test4.js" in {
+    "handle multiple parameters" in {
       runChecksParams(Map(
         "params2" -> ("This {0} has {1} two params.", "'arg0','arg1'", "This arg0 has arg1 two params."),
         "params3" -> ("This {0} has {1} three {2} params.", "'arg0','arg1','arg2'", "This arg0 has arg1 three arg2 params."),
@@ -122,7 +130,7 @@ class JsResourceBundleSpecs extends WordSpec with Matchers {
       ), 4)
     }
 
-    "generate test5.js" in {
+    "handle out-of-order parameters" in {
       runChecksParams(Map(
         "order2" -> ("Out {1} of {0} order", "'arg0','arg1'", "Out arg1 of arg0 order"),
         "order3" -> ("Out {1} of {0} order {2}", "'arg0','arg1','arg2'", "Out arg1 of arg0 order arg2"),
@@ -130,13 +138,22 @@ class JsResourceBundleSpecs extends WordSpec with Matchers {
       ), 5)
     }
 
-    "generate test6.js" in {
+    "handle parameterized strings with quotes" in {
       runChecksParams(Map(
         "contains.quotes" -> ("This \" has a {0} quote", "'arg0'", "This \" has a arg0 quote"),
         "arg.contains.quote" -> ("This has {0} no quotes", "'ar\"g'", "This has ar\"g no quotes"),
         "both.contain.quotes" -> ("These \" both have a {0} quote", "'ar\"g'", "These \" both have a ar\"g quote"),
         "single.quote" -> ("a ' {0} single", "'arg0'", "a ' arg0 single")
       ), 6)
+    }
+
+    "have a safe accessor" in {
+      runCheckV(Map(
+        "no.params" -> ("no params", "i18n.localize('no.params', 'default')", "no params"),
+        "undefined" -> ("ignored", "i18n.localize('garbage', 'default')", "default"),
+        "one.arg" -> ("one {0} param", "i18n.localize('one.arg', 'default', 'arg0')", "one arg0 param"),
+        "two.args" -> ("{1} two {0} params", "i18n.localize('two.args', 'default', 'arg0', 'arg1')", "arg1 two arg0 params")
+      ), 7)
     }
   }
 }
@@ -147,7 +164,9 @@ import org.scalacheck._
 
 object JsResourceBundleChecks extends Properties("JsResourceBundle") {
   import Prop._
-  import JsEngine.jsCheckBoolean
+
+  def jsCheckBoolean(js: String, expected: String): Boolean =
+    JsEngine.returnv(js).map(expected == _ ).getOrElse(false)
 
   property("toJs(no param values)") = forAll(Gen.identifier, Gen.identifier) { (k:String, v:String) =>
     (!k.isEmpty) ==> {
