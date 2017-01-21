@@ -4,7 +4,7 @@ organization := "com.joescii"
 
 version := "0.1"
 
-scalaVersion := "2.10.3"
+scalaVersion := "2.12.1"
 
 autoScalaLibrary := false
 
@@ -17,8 +17,8 @@ resolvers ++= Seq(
 
 libraryDependencies ++= {
   Seq(
-    "org.scalatest"  %% "scalatest"   % "1.9.1"  % "test",
-    "org.scalacheck" %% "scalacheck"  % "1.10.1" % "test",
+    "org.scalatest"  %% "scalatest"   % "3.0.1"  % "test",
+    "org.scalacheck" %% "scalacheck"  % "1.13.4" % "test",
     "org.mozilla"    %  "rhino"       % "1.7R4"  % "test"
   )
 }

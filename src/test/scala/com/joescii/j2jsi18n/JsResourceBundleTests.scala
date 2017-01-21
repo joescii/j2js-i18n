@@ -1,7 +1,6 @@
 package com.joescii.j2jsi18n
 
 import org.scalatest._
-import matchers.ShouldMatchers
 
 import java.util.ResourceBundle
 import java.util
@@ -18,7 +17,7 @@ case class TestBundle(entries:Map[String, String]) extends ResourceBundle {
 }
 
 /** That's right... we're testing the test code */
-class TestBundleSpecs extends WordSpec with ShouldMatchers {
+class TestBundleSpecs extends WordSpec with Matchers {
   "TestBundle" should {
     "implement getString()" in {
       val jbundle = TestBundle("ok" -> "OK", "cancel" -> "Cancel", "apples" -> "I have {0} apples.")
@@ -32,7 +31,7 @@ class TestBundleSpecs extends WordSpec with ShouldMatchers {
   }
 }
 
-class JsResourceBundleSpecs extends WordSpec with ShouldMatchers {
+class JsResourceBundleSpecs extends WordSpec with Matchers {
   lazy val dir = new File(System.getProperty("com.joescii.test.js"))
 
   def write(name:String, contents:String) = {
