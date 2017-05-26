@@ -14,3 +14,6 @@ project/plugins/project/
 
 # IntelliJ stuff
 .idea/
+
+*.swp
+
