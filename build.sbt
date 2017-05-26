@@ -4,7 +4,7 @@ organization := "com.joescii"
 
 version := "0.2.0"
 
-scalaVersion := "2.12.1"
+scalaVersion := "2.12.2"
 
 autoScalaLibrary := false
 
@@ -25,17 +25,16 @@ libraryDependencies ++= {
 
 javacOptions in (Compile,compile) ++= Seq("-source", "1.6", "-target", "1.6", "-g")
 
-scalacOptions <<= scalaVersion map { v: String =>
+scalacOptions := { 
   val opts = "-deprecation" :: "-unchecked" :: Nil
-  if (v.startsWith("2.9.")) opts 
+  if (scalaVersion.value.startsWith("2.9.")) opts 
   else opts ++ ("-feature" :: "-language:postfixOps" :: "-language:implicitConversions" :: Nil)
 }
 
 // Publishing stuff for sonatype
-publishTo <<= version { _.endsWith("SNAPSHOT") match {
-    case true  => Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots")
-    case false => Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
-  }
+publishTo := {
+  if(version.value.endsWith("SNAPSHOT")) Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots")
+  else Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
 }
 
 credentials += Credentials( file("sonatype.credentials") )
@@ -72,21 +71,21 @@ pomExtra := (
 seq(jasmineSettings : _*)
 
 // This is where our test stuff drops off the generated javascript files
-appJsDir <+= (resourceManaged in Test) { _ / "js" }
+appJsDir += (resourceManaged in Test).value / "js" 
 
 // Don't really use this, but without it the plugin doesn't run.
-appJsLibDir <+= (resourceManaged in Test) { _ / "js" }
+appJsLibDir += (resourceManaged in Test).value / "js"
 
 // Our specs files live here.
-jasmineTestDir <+= sourceDirectory { src => src / "test" / "js" }
+jasmineTestDir += sourceDirectory.value / "test" / "js"
 
-jasmineConfFile <+= sourceDirectory { src => src / "test" / "js" / "test.dependencies.js" }
+jasmineConfFile += sourceDirectory.value / "test" / "js" / "test.dependencies.js"
 
-jasmineRequireJsFile <+= sourceDirectory { src => src / "test" / "js" / "3rdlib" / "require" / "require-2.0.6.js" }
+jasmineRequireJsFile += sourceDirectory.value / "test" / "js" / "3rdlib" / "require" / "require-2.0.6.js"
 
-jasmineRequireConfFile <+= sourceDirectory { src => src / "test" / "js" / "3rdlib" / "require.conf.js" }
+jasmineRequireConfFile += sourceDirectory.value / "test" / "js" / "3rdlib" / "require.conf.js" 
 
-(jasmine) <<= (jasmine) dependsOn (test in Test)
+(jasmine) := (jasmine) dependsOn (test in Test)
 
 // Create a target directory and set a system property so our JS-generating tests know where to put their files
 resourceGenerators in Test <+= (resourceManaged in Test) map { rsrc =>
