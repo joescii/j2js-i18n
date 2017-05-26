@@ -84,7 +84,7 @@ class JsResourceBundleSpecs extends WordSpec with Matchers {
 
   def runCheckV(m: Map[String, (String, String, String)], i: Int): Unit = {
     val input = m.mapValues(_._1)
-    val js = new JsResourceBundle(TestBundle(input)).toJs
+    val js = new JsResourceBundle(TestBundle(input)).toJs("null") // Need to kill logging since console isn't defined
     write(s"test$i.js", s"var test$i = $js;")
     m.foreach { case (k, (_, v, expected)) =>
       val result = JsEngine.returnv(s"""i18n = $js; v = $v;""")
