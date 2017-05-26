@@ -8,8 +8,6 @@ import java.util.regex.Pattern;
  * JavaScript ResourceBundle
  */
 public class JsResourceBundle {
-    private final ResourceBundle bundle;
-
     /**
      * Instantiates a new <code>JsResourceBundle</code> backed by the <code>ResourceBundle</code> given.
      * @param bundle The <code>ResourceBundle</code> to back this <code>JsResourceBundle</code>.
@@ -18,31 +16,27 @@ public class JsResourceBundle {
         this.bundle = bundle;
     }
 
-    private static final Pattern arg = Pattern.compile("(.*?)\\{(\\d+)\\}([^\\{]*)");
-
-    private String legalize(String s) {
-        return s.replaceAll("\\\\", Matcher.quoteReplacement("\\\\"))
-                .replaceAll("\"", Matcher.quoteReplacement("\\\""))
-                .replaceAll("\\n", "\\\\n")
-                ;
-    }
-
-    private String localizeJsFn =
-            "localize:function(i,d){" +
-                "var f=this[i];"+
-                "var as=3<=arguments.length?[].slice.call(arguments,2):[];"+
-                "if(typeof f==='function')" +
-                    "return f.apply(this,as);" +
-                "else return d;"+
-            "},";
-
     /**
-     * Returns this <code>JsResourceBundle</code> as a JavaScript object
-     * @return
+     * Returns this <code>JsResourceBundle</code> as a JavaScript object.
+     * Defaults <code>logMiss</code> to <code>JsCode.logMissWithArgs</code>.
+     * @return a string-encoded JS object.
      */
     public String toJs() {
+        return toJs(JsCode.logMissWithArgs);
+    }
+
+    /**
+     * Returns this <code>JsResourceBundle</code> as a JavaScript object.
+     * Any localization key/id misses are passed to the <code>logMissFn</code>
+     * @param logMissFn javascript callback function called when a localization miss occurs (@seeAlso JsCode).
+     * @return a string-encoded JS object.
+     */
+    public String toJs(String logMissFn) {
         final StringBuilder sb = new StringBuilder();
+        String logMissFnClean = logMissFn.trim();
+        if(logMissFnClean.endsWith(";")) logMissFnClean = logMissFnClean.substring(0, logMissFnClean.length() - 1);
         sb.append('{');
+        sb.append("logMiss:" + logMissFnClean + ",");
         sb.append(localizeJsFn);
         for(Iterator<String> iter = bundle.keySet().iterator(); iter.hasNext();) {
             final String key = iter.next();
@@ -89,4 +83,29 @@ public class JsResourceBundle {
         sb.append('}');
         return sb.toString();
     }
+    
+    private final ResourceBundle bundle;
+
+    private static final Pattern arg = Pattern.compile("(.*?)\\{(\\d+)\\}([^\\{]*)");
+
+    private String legalize(String s) {
+        return s.replaceAll("\\\\", Matcher.quoteReplacement("\\\\"))
+                .replaceAll("\"", Matcher.quoteReplacement("\\\""))
+                .replaceAll("\\n", "\\\\n")
+                ;
+    }
+
+    private String localizeJsFn =
+        "localize:function(i,d){" +
+            "var f=this[i];" +
+            "var as=3<=arguments.length?[].slice.call(arguments,2):[];" +
+            "if(typeof f==='function')" +
+                "return f.apply(this,as);" +
+            "else if(typeof this.logMiss==='function'){" +
+                "this.logMiss.apply(this,[].slice.call(arguments));" +
+                "return d;" +
+            "}" +
+            "else return d;"+
+        "},";
+
 }

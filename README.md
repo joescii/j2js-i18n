@@ -44,14 +44,20 @@ Add **j2js-i18n** as a dependency in your `build.sbt` or `Build.scala` as approp
 ```scala
 libraryDependencies ++= Seq(
   // Other dependencies ...
-  "com.joescii" % "j2js-i18n" % "0.2.0" % "compile"
+  "com.joescii" % "j2js-i18n" % "0.3.0" % "compile"
 )
 ```
 
 ## Usage
 
 To use **j2js-i18n**, you instantiate a `com.joescii.j2jsi18n.JsResourceBundle` passing it the `java.util.ResourceBundle` that is appropriate for the request's locale (here we assume your web application framework is already doing a great job of choosing the appropriate bundles).  
-Call the `toJs()` method to access the JavaScript object.
+Call the `toJs()` method to access the JavaScript object and embed it in the JavaScript asset you wish to serve.
+
+### toJs()
+The `toJs()` function is overloaded to optionally take a `String` argument.
+This string is meant to contain a JavaScript function for logging localization misses, i.e. where the key/id was not found in the bundle for the given locale.
+By default, this is set to `JsCode.logMissWithArgs` and hence you'll see the ID and the arguments passed.
+You are welcome to provide your own JS function, and use some of the pieces provided in `JsCode`.
 
 ## Javadocs
 
@@ -85,6 +91,9 @@ case object MySnip {
 
 ## Change log
 
+* *0.3.0*: No breaking changes.
+Now by default localization misses (i.e. the id/key requested is not in the bundle) are logged to the console.
+The `JsResourceBundle.toJs()` method is now overloaded to provide your own `logMiss` callback as you like.
 * *0.2.0*: **BREAKING CHANGE:** All entries are now functions, i.e. strings with no parameters are a function expecting zero arguments.
 Added `localize(id, default, arg...)` to allow safe access to values with a default when an `id` is not defined.
 * *0.1.1*: Bug fix to correctly escape quotes in parameterized strings
